@@ -1,0 +1,4 @@
+ul#accordion { float: left; width: 300px; }
+ul#accordion li { float: left; width: 298px; }
+ul#accordion a.heading { width: 298px; }
+ul#accordion ul li { float: none; width: auto; }

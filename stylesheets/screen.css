@@ -1,0 +1,57 @@
+/* Accordian Stylesheet */
+
+/*****Reset*****/
+html, body, div, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd, p, blockquote, pre, form, fieldset, table, th, td { margin: 0; padding: 0; }
+
+/*****Basic Definitions*****/
+body { background: #fff; color: #333; font: 14px/20px Georgia, "Times New Roman", Times, serif; }
+h1 { font-size: 24px; line-height: 30px; margin-bottom: 18px; }
+
+a { }
+a:visited { }
+a:hover { text-decoration: none; }
+img { border: none; }
+p, ul, ol, dl, table { margin-bottom: 18px; }
+ul, ol, dd { margin-left: 36px; }
+
+/*****Custom Classes*****/
+.clearing { clear: both; }
+.clearfix { overflow: hidden; }
+.last { margin-bottom: 0; }
+.screenReader { left: -9999px; position: absolute; top: -9999px; }
+
+/*****Basic Layout*****/
+div#container { margin: 0 auto; overflow: hidden; padding: 20px 0; width: 960px; }
+div#content { float: left; width: 600px; }
+div#sidebar { float: right; font-size: 12px; line-height: 18px; width: 300px; }
+
+/*****Accordion Styles*****/
+ul#accordion, ul#accordion ul { list-style: none; margin: 0; }
+ul#accordion { border-bottom: 1px solid #000E2E; }
+ul#accordion li { border: 1px solid #000E2E; border-bottom: none; }
+ul#accordion ul li { border: none; border-bottom: 1px solid #C2C8D1; color: #999; padding: 5px 10px; }
+ul#accordion ul li:last-child { border-bottom: none; }
+ul#accordion a.heading { 
+	background: #F4FFF9;
+	color: #999;
+	display: block;
+	font-size: 18px;
+	line-height: 18px;
+	padding: 10px 5px;
+	text-decoration: none;
+}
+ul#accordion a.heading:hover { background: #00B9D2; color: #fff; }
+ul#accordion li.ui-accordion-selected a.heading, ul#accordion li.current a.heading { background: #025185; color: #fff; }
+ul#accordion li ul a { border-bottom: 1px solid #00B9D2; color: #025185; text-decoration: none; }
+ul#accordion li ul a:hover { border-bottom: none; }
+ul#accordion li ul .date { padding-right: 10px; }
+ul#accordion li ul .count { padding-left: 10px; }
+
+/*****Additional Custom Accordion Styles*****/
+body#customAccordion ul#accordion li ul { display: none; }
+body#customAccordion ul#accordion li.current ul { display: block; }
+
+
+
+
+

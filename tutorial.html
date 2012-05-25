@@ -1,0 +1,382 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Creating a jQuery Accordion from Scratch</title>
+</head>
+
+<body>
+
+<h1>Creating a jQuery Accordion from Scratch</h1>
+<img src="images/accordion-thumb.jpg" alt="jQuery Accordion" height="200" width="200" />
+<p>Accordions can be very useful for showing lots of different sections of data in a small amount of space. jQuery UI has a built in <a href="http://docs.jquery.com/UI/Accordion">Accordian function</a>, but according to the <a href="http://ui.jquery.com/download">jQuery UI Build your Download</a>, the size of the Core jQuery UI and Accordian scripts are:</p>
+
+<ul>
+	<li>Normal: 25.16 kb</li>
+	<li>Packed: 16.61 kb</li>
+</ul>
+
+<p>That seems like a lot for just one simple accordion. Especially when you add in the normal jQuery script, which is 18kb minified and Gzipped. So instead of increasing your page load time with the extra unneeded functionality, why not create something from scratch?</p>
+
+<p>I also think that writing things from scratch really gives you a much better understand of how to use jQuery effectively, without always turning to use someone else&rsquo;s code.</p>
+
+<p>So the plan for this tutorial is to show create an accordion using the jQuery UI function, then create one using some custom coding. Let&rsquo;s use a blog sidebar as an example.</p>
+
+
+<h2>The Markup</h2>
+
+<p>The markup is very simple, just a list item for each section in the accordion:</p>
+
+<pre name="code" class="html">&lt;ul id="accordion">
+	&lt;li>
+		&lt;a href="#recent" class="heading">Recent Entries&lt;/a>
+		&lt;ul id="recent">
+			&lt;li>&lt;span class="date">01.19.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">01.15.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">01.13.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">01.11.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">01.10.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+		&lt;/ul>
+	&lt;/li>
+	&lt;li>
+		&lt;a href="#popular" class="heading">Popular Entries&lt;/a>
+		&lt;ul id="popular">
+			&lt;li>&lt;span class="date">08.16.2008&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">06.12.2008&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">04.12.2008&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">06.12.2007&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">03.12.2007&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+		&lt;/ul>
+	&lt;/li>
+	&lt;li>
+		&lt;a href="#categories" class="heading">Categories&lt;/a>
+		&lt;ul id="categories">
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">7&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">4&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">15&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">29&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">8&lt;/span>&lt;/li>
+		&lt;/ul>
+	&lt;/li>
+	&lt;li>
+		&lt;a href="#archive" class="heading">Archive&lt;/a>
+		&lt;ul id="archive">
+			&lt;li>&lt;a href="#">January 2009&lt;/a> &lt;span class="count">4&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">December 2008&lt;/a> &lt;span class="count">14&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">November 2008&lt;/a> &lt;span class="count">12&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">October 2008&lt;/a> &lt;span class="count">8&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">September 2008&lt;/a> &lt;span class="count">18&lt;/span>&lt;/li>
+		&lt;/ul>
+	&lt;/li>
+&lt;/ul></pre>
+
+<h2>The CSS</h2>
+<p>We are going to add some very basic styling so that the accordion looks more presentable. Since this tutorial is mainly focused on the JavaScript, I am going to run through what we are doing with the CSS quickly.</p>
+
+<p>Since I always start from my own simple framework stylesheet, I&rsquo;m going to use it here too:</p>
+<pre name="code" class="css">/*****Reset*****/
+html, body, div, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd, p, blockquote, pre, form, fieldset, table, th, td { margin: 0; padding: 0; }
+
+/*****Basic Definitions*****/
+body { background: #fff; color: #333; font: 14px/20px Georgia, "Times New Roman", Times, serif; }
+h1 { font-size: 24px; line-height: 30px; margin-bottom: 18px; }
+
+a { }
+a:visited { }
+a:hover { text-decoration: none; }
+img { border: none; }
+p, ul, ol, dl, table { margin-bottom: 18px; }
+ul, ol, dd { margin-left: 36px; }
+
+/*****Custom Classes*****/
+.clearing { clear: both; }
+.clearfix { overflow: hidden; }
+.last { margin-bottom: 0; }
+.screenReader { left: -9999px; position: absolute; top: -9999px; }</pre>
+
+<p>Next, I am going to remove the margin and list-style from the accordion unordered list and the descendant lists and add a bottom border to the accordion unordered list (you will see why it is only a bottom border shortly).</p>
+
+<pre name="code" class="css">ul#accordion, ul#accordion ul { list-style: none; margin: 0; }
+ul#accordion { border-bottom: 1px solid #000E2E; }</pre>
+
+<p>Then, I am going to add a border around each accordion section, except the bottom border. Also, I am going to remove the border from list items that are descendants of the accordion section and add only a bottom border. If it is the last child of a descendant unordered list, I am going to remove the bottom border. Yes, I know this will not work in IE, but it&rsquo;s not essential.</p>
+
+<pre name="code" class="css">ul#accordion li { border: 1px solid #000E2E; border-bottom: none; }
+ul#accordion ul li { 
+	border: none;
+	border-bottom: 1px solid #C2C8D1;
+	color: #999;
+	padding: 5px 10px;
+}
+ul#accordion ul li:last-child { border-bottom: none; }</pre>
+
+<p>Next, I am going to style the main link that will toggle the accordion so that they stand out more:</p>
+
+<pre name="code" class="css">ul#accordion a.heading { 
+	background: #F4FFF9;
+	color: #999;
+	display: block;
+	font-size: 18px;
+	line-height: 18px;
+	padding: 10px 5px;
+	text-decoration: none;
+}
+ul#accordion a.heading:hover { background: #00B9D2; color: #fff; }</pre>
+
+<p>Finally, I am just going to do some basic styling on the sub lists of the accordion so that they look a little nicer:</p>
+
+<pre name="code" class="css">ul#accordion li ul a { border-bottom: 1px solid #00B9D2; color: #025185; text-decoration: none; }
+ul#accordion li ul a:hover { border-bottom: none; }
+ul#accordion li ul .date { padding-right: 10px; }
+ul#accordion li ul .count { padding-left: 10px; }</pre>
+
+<p><a href="accordion-markup.htm">Let&rsquo;s take a look at where we are so far.</a> This is also what the accordion will look like when we are using the jQuery UI Accordion and JavaScript is disabled.</p>
+
+<a href="accordion-markup.htm"><img src="images/accordion-markup-screenshot.jpg" alt="Accordion Markup" height="548" width="600" /></a>
+
+<p>It looks like we will need to add some additional CSS for IE6 to account for the <a href="http://www.google.com/search?q=IE6+whitespace+bug">whitespace bug</a>:</p>
+
+<pre name="code" class="css">ul#accordion { float: left; width: 300px; }
+ul#accordion li { float: left; width: 298px; }
+ul#accordion a.heading { width: 298px; }
+ul#accordion ul li { float: none; width: auto; }</pre>
+
+
+<h2>The jQuery UI Accordion</h2>
+
+<p>Now that we&rsquo;ve got all the markup and styling complete, it is very simple to implement the jQuery UI accordion. First, we just need to include <a href="scripts/jquery.js">jQuery</a> and our <a href="scripts/jquery-ui-accordion.js">jQuery UI script</a>.</p>
+
+<pre name="code" class="html">&lt;script type="text/javascript" src="scripts/jquery.js">&lt;/script>
+&lt;script type="text/javascript" src="scripts/jquery-ui-accordion.js">&lt;/script></pre>
+
+<p>Then, we need to initialize the accordion on our unordered list with an id of accordion:</p>
+<pre name="code" class="js">&lt;script type="text/javascript">
+	$(document).ready(function() {
+		$('#accordion').accordion();
+	});
+&lt;/script></pre>
+
+<p>And there you have it, a <a href="accordion-jquery-ui.htm">working accordion</a>.</p>
+
+<p>To make the currently open accordion item stand out more, I added a little extra CSS:</p>
+
+<pre name="code" class="css">ul#accordion li.ui-accordion-selected a.heading { background: #025185; color: #fff; }</pre>
+
+<p>The class name of <strong>ui-accordion-selected</strong> is automatically added to the current accordion section.</p>
+
+<h2>Our Custom jQuery Accordion</h2>
+<p>Now that we have done the jQuery UI accordion, it&rsquo;s time to create our own. One thing that I don&rsquo;t necessarily like about the jQuery UI version is the way it displays when JavaScript is disabled. I would prefer to have it so that only one section is open at a time.</p>
+<p>To accomplish this, I am going to add in a little PHP. You could easily accomplish this with any programming language as well.</p>
+<p>The idea behind this is that we are going to pass a variable in the URL, and if the variable coincides with each section, we assign a class of <strong>current</strong> to that section. It is much easier to see this in code, so have a look:</p>
+
+<pre name="code" class="php">&lt;?php $section = $_GET['section']; ?>
+&lt;ul id="accordion">
+	&lt;li&lt;?php if($section == '' || $section == 'recent'): ?> class="current"&lt;?php endif; ?>>
+		&lt;a href="?section=recent" class="heading">Recent Entries&lt;/a>
+		&lt;ul id="recent">
+			&lt;li>&lt;span class="date">01.19.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">01.15.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">01.13.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">01.11.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">01.10.2009&lt;/span> &lt;a href="#">Recent Entry Title&lt;/a>&lt;/li>
+		&lt;/ul>
+	&lt;/li>
+	&lt;li&lt;?php if($section == 'popular'): ?> class="current"&lt;?php endif; ?>>
+		&lt;a href="?section=popular" class="heading">Popular Entries&lt;/a>
+		&lt;ul id="popular">
+			&lt;li>&lt;span class="date">08.16.2008&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">06.12.2008&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">04.12.2008&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">06.12.2007&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+			&lt;li>&lt;span class="date">03.12.2007&lt;/span> &lt;a href="#">Popular Entry Title&lt;/a>&lt;/li>
+		&lt;/ul>
+	&lt;/li>
+	&lt;li&lt;?php if($section == 'categories'): ?> class="current"&lt;?php endif; ?>>
+		&lt;a href="?section=categories" class="heading">Categories&lt;/a>
+		&lt;ul id="categories">
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">7&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">4&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">15&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">29&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">Category Name&lt;/a> &lt;span class="count">8&lt;/span>&lt;/li>
+		&lt;/ul>
+	&lt;/li>
+	&lt;li&lt;?php if($section == 'archive'): ?> class="current"&lt;?php endif; ?>>
+		&lt;a href="?section=archive" class="heading">Archive&lt;/a>
+		&lt;ul id="archive">
+			&lt;li>&lt;a href="#">January 2009&lt;/a> &lt;span class="count">4&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">December 2008&lt;/a> &lt;span class="count">14&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">November 2008&lt;/a> &lt;span class="count">12&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">October 2008&lt;/a> &lt;span class="count">8&lt;/span>&lt;/li>
+			&lt;li>&lt;a href="#">September 2008&lt;/a> &lt;span class="count">18&lt;/span>&lt;/li>
+		&lt;/ul>
+	&lt;/li>
+&lt;/ul></pre>
+
+<p>You should also notice that I changed the url of each of the links the toggle the accordion sections to match up with the if statement for the section. So basically, if JavaScript is disabled, you will be taken to a new page with that section open.</p>
+
+<p>We also need to remove the jQuery UI accordion script, and include our own:</p>
+<pre name="code" class="html">&lt;script type="text/javascript" src="scripts/accordion.js">&lt;/script></pre>
+
+<h3>Additional CSS</h3>
+<p>With this slight change to the markup, we need to add in a little additional CSS. We no longer have the <strong>ui-accordion-selected</strong> class being assigned to the list items; it is now a class of <strong>current</strong>. We also have to account for this class name change in the on state for the accordion:</p>
+
+<pre name="code" class="css">ul#accordion li.current a.heading { background: #025185; color: #fff; }</pre>
+
+<p>So what we want to do is hide all of the unordered lists, unless they are a descendant of the list item with a class of <strong>current</strong>. I have also added a body id to this demo page so that we can use the same stylesheet for both examples.</p>
+
+<pre name="code" class="css">body#customAccordion ul#accordion li ul { display: none; }
+body#customAccordion ul#accordion li.current ul { display: block; }</pre>
+
+<h3>The Custom JavaScript</h3>
+<p>First, we want to execute the script once the document is loaded, so we start with this:</p>
+
+<pre name="code" class="js">$(document).ready(function() {
+
+});</pre>
+
+<p>We want the accordion to function when the heading links are clicked, but we don&rsquo;t want to leave the page so we need to make sure and <strong>return false</strong>:</p>
+
+<pre name="code" class="js">$(document).ready(function() {
+	<strong>$('ul#accordion a.heading').click(function() {
+		return false;
+	});</strong>
+});</pre>
+
+<p>Next, I don&rsquo;t like the outline that shows up around the links when they are clicked, so I set that to none:</p>
+
+<pre name="code" class="js">$(document).ready(function() {
+	$('ul#accordion a.heading').click(function() {
+		<strong>$(this).css('outline','none');</strong>
+		return false;
+	});
+});</pre>
+
+<p>There are two different cases for this script.</p>
+
+<ol>
+	<li>The link being clicked is the section that is already open.</li>
+	<li>The link being clicked is <strong>not</strong> the section that is already open.</li>
+</ol>
+
+<h4>The First Case</h4>
+<p>This is not functionality that the jQuery UI version has, but I think a user should be able to close all sections if they want. If the link clicked has a parent that has a class of current, we want to slide up the unordered list and remove the class of current.</p>
+
+<pre name="code" class="js">$(document).ready(function() {
+	$('ul#accordion a.heading').click(function() {
+		$(this).css('outline','none');
+		<strong>if($(this).parent().hasClass('current')) {
+			$(this).siblings('ul').slideUp('slow',function() {
+				$(this).parent().removeClass('current');
+			});
+		}</strong>
+		return false;
+	});
+});</pre>
+
+<p>Another thing that bugs me about the jQuery UI version, is that you can scroll the accordion so it is almost out of view, click it, and then the interaction happens above what you can see. Scroll down on the <a href="accordion-jquery-ui.htm">jQuery UI example</a> and give it a try.</p>
+
+<p>So my solution is to use this wonderful little script called <a href="http://plugins.jquery.com/project/ScrollTo">jQuery ScrollTo</a>. It is a very small script that adds smooth page scrolling.</p>
+
+<p>Let&rsquo;s add that to the head of the document before our accordion script:</p>
+
+<pre><code>&lt;script type="text/javascript" src="scripts/jquery.js">&lt;/script>
+&lt;script type="text/javascript" src="scripts/jquery-scrollTo.js">&lt;/script>
+&lt;script type="text/javascript" src="scripts/accordion.js">&lt;/script></code></pre>
+
+<p>When the section scrolls up, I want to scroll the window to the top of the accordion:</p>
+
+<pre name="code" class="js">$(document).ready(function() {
+	$('ul#accordion a.heading').click(function() {
+		$(this).css('outline','none');
+		if($(this).parent().hasClass('current')) {
+			$(this).siblings('ul').slideUp('slow',function() {
+				$(this).parent().removeClass('current');
+				<strong>$.scrollTo('#accordion',1000);</strong>
+			});
+		}
+		return false;
+	});
+});</pre>
+
+<p>The first parameter of the function is the target to scroll to, and the second is the amount of time it should take.</p>
+
+<h4>The Second Case</h4>
+
+<p>This case occurs when the section that is clicking is not currently open. So the first thing we want to do is hide the currently open section and remove the class of current (this piece of the code is very similar to the first case):</p>
+
+<pre name="code" class="js">$(document).ready(function() {
+	$('ul#accordion a.heading').click(function() {
+		$(this).css('outline','none');
+		if($(this).parent().hasClass('current')) {
+			$(this).siblings('ul').slideUp('slow',function() {
+				$(this).parent().removeClass('current');
+				$.scrollTo('#accordion',1000);
+			});
+		} else {
+			<strong>$('ul#accordion li.current ul').slideUp('slow',function() {
+				$(this).parent().removeClass('current');
+			});</strong>
+		}
+		return false;
+	});
+});</pre>
+
+<p>Next, we want to open the section we clicked and add the class of current:</p>
+<pre name="code" class="js">$(document).ready(function() {
+	$('ul#accordion a.heading').click(function() {
+		$(this).css('outline','none');
+		if($(this).parent().hasClass('current')) {
+			$(this).siblings('ul').slideUp('slow',function() {
+				$(this).parent().removeClass('current');
+				$.scrollTo('#accordion',1000);
+			});
+		} else {
+			$('ul#accordion li.current ul').slideUp('slow',function() {
+				$(this).parent().removeClass('current');
+			});
+			<strong>$(this).siblings('ul').slideToggle('slow',function() {
+				$(this).parent().toggleClass('current');
+			});</strong>
+		}
+		return false;
+	});
+});</pre>
+
+<p>Finally, let&rsquo;s scroll the window to the top of the accordion, just like we did in the first case:</p>
+
+
+<pre name="code" class="js">$(document).ready(function() {
+	$('ul#accordion a.heading').click(function() {
+		$(this).css('outline','none');
+		if($(this).parent().hasClass('current')) {
+			$(this).siblings('ul').slideUp('slow',function() {
+				$(this).parent().removeClass('current');
+				$.scrollTo('#accordion',1000);
+			});
+		} else {
+			$('ul#accordion li.current ul').slideUp('slow',function() {
+				$(this).parent().removeClass('current');
+			});
+			$(this).siblings('ul').slideToggle('slow',function() {
+				$(this).parent().toggleClass('current');
+			});
+			<strong>$.scrollTo('#accordion',1000);</strong>
+		}
+		return false;
+	});
+});</pre>
+
+<p><a href="accordion-custom-jquery.php">Take a look at our custom jQuery accordion.</a></p>
+
+<p>That&rsquo;s it. Seriously. Did you think creating an accordion could be that simple?</p>
+
+<h2>Conclusion</h2>
+<p>Now, let&rsquo;s compare the JavaScript file sizes using the Net tab in <a href="http://getfirebug.com/">Firebug</a>.</p>
+
+<p>In the jQuery UI example, the JavaScript files total about <strong>73 kb</strong>. In our custom example, with the additional scrolling of the window, the JavaScript files total about <strong>57 kb</strong>. Now, that may not seem like much, but imagine if you have a very high traffic site. That could be a lot of bytes saved. Plus, now you understand more about jQuery.</p>
+
+<p>Now go out and write your own jQuery.</p>
+
+</body>
+</html>
